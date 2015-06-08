@@ -27,23 +27,32 @@ CREATE TABLE aux_ajpelu_bor_cli as
 SELECT 
  v.cli_id,
  cli_celdas.id,
- cli_celdas.the_geom
+ cli_mapas_pasados.cli_celda_id,
+ cli_indice_mapas_pasados.ano, 
+ cli_variables.codigo, 
+ cli_variables.descripcion, 
+ cli_mapas_pasados.valor
 FROM
   cli_celdas, 
   (SELECT 
     cli_celdas.id as cli_id
   FROM 
     aux_ajpelu_2300 as aux, 
-    cli_celdas as cli 
+    cli_celdas
   WHERE 
-    ST_Within(cli_celdas.the_geom, aux.geom)) AS v
+    ST_Within(cli_celdas.the_geom, aux.geom)) AS v,
+  cli_mapas_pasados,
+  cli_indice_mapas_pasados,
+  cli_variables
 WHERE 
-  v.cli_id = cli_celdas.id;
- 
-
-
-
-v.cli_id = cli_mapas_pasados.cli_celda_id 
+  v.cli_id = cli_celdas.id AND
+  v.cli_id = cli_mapas_pasados.cli_celda_id AND
+  cli_mapas_pasados.cli_indice_mapas_pasado_id = cli_indice_mapas_pasados.id AND
+  cli_indice_mapas_pasados.cli_variable_id = cli_variables.id LIMIT 10;
+  
+  
+  
+  
  
  SELECT 
   aux_ajpelu_cli.cli_id, 
