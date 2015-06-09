@@ -1,0 +1,27 @@
+---
+title: "Untitled"
+output: md_document
+---
+
+
+```{r}
+library('dplyr')
+```
+
+
+
+```{r}
+
+di <- '/Users/ajpelu/ownCloud/MS/CONGRESO_AEET2015/borreguiles/borreguiles_talk'
+
+data <- read.csv(file=paste(di, '/data/climate_2300.csv', sep=''), header=TRUE, sep=";")
+
+```
+
+
+```{r}
+df <- tbl_df(data)
+
+df %>% 
+  filter(codigo == 'tmin')
+
