@@ -22,6 +22,30 @@ data <- read.csv(file=paste(di, '/data/climate_2300.csv', sep=''), header=TRUE, 
 ```{r}
 df <- tbl_df(data)
 
-df %>% 
-  filter(codigo == 'tmin')
+# Get mean 1980-1990 
+tmin80 <- df %>% 
+            filter(codigo == 'tmin', ano >= 1980, ano <= 1990) %>%
+            mutate(valorC = valor / 10) %>%
+            group_by(cli_celda_id) %>%
+            summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC)
+tmin80 <- mutate(tmin80, tipo='tmin80')
+
+tmin00 <- df %>% 
+            filter(codigo == 'tmin', ano >= 2000, ano <= 2010) %>%
+            mutate(valorC = valor / 10) %>%
+            group_by(cli_celda_id) %>%
+            summarise_each(funs(mean,sd,se=sd(.)/sqrt(n())), valorC)
+tmin00 <- mutate(tmin00, tipo='tmin00')
+
+
+
+  filter(ano >= 1980) %>% 
+  filter(ano <= 1990) %>%
+
+
+
+  summarise(media=mean(valor), 
+            )
+
+
 
