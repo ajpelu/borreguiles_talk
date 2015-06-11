@@ -64,7 +64,7 @@ ggplot(ts_precip, aes(x=ano, y=mean)) +
 ### Differences between decades
 * Diferences between 1980's and 2000's values of temperatures and precipitation
 * t-test 
-
+#### Temperatures 
 ```{r}
 # Temperatures for all pixels 
 t80 <- df %>% 
@@ -97,7 +97,7 @@ tidy(t.test(tmax80$mean, tmax00$mean, paired = TRUE))
 
 
 # Get mean of 1980's 
-mean80 <- df %>% 
+mean80t <- df %>% 
   filter(ano >= 1980, ano <= 1990) %>%
   filter(codigo == 'tmin' | codigo == 'tmax') %>% 
   mutate(valorC = valor / 10) %>%
@@ -106,7 +106,7 @@ mean80 <- df %>%
     mutate(timerange = "1980's")
 
 # Get mean of 2000's 
-mean00 <- df %>% 
+mean00t <- df %>% 
   filter(ano >= 2000, ano <= 2010)%>%
   filter(codigo == 'tmin' | codigo == 'tmax') %>% 
   mutate(valorC = valor / 10) %>%
@@ -114,9 +114,48 @@ mean00 <- df %>%
   summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC) %>%
   mutate(timerange = "2000's")
 
-mean10 <- rbind(mean80, mean00)
-mean10 
+mean10t <- rbind(mean80t, mean00t)
+mean10t 
+```
 
+#### Precipitation
+```{r}
+# Precipitation for all pixels 
+p80 <- df %>% 
+  filter(ano >= 1980, ano <= 1990) %>%
+  filter(codigo == 'precip') %>%
+  group_by(cli_celda_id) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valor) 
+
+p00 <- df %>% 
+  filter(ano >= 2000, ano <= 2010) %>%
+  filter(codigo == 'precip') %>%
+  group_by(cli_celda_id) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valor) 
+
+# T.test of precip 
+t.test(p80$mean, p00$mean, paired = TRUE) 
+tidy(t.test(p80$mean, p00$mean, paired = TRUE))
+
+
+# Get mean of 1980's 
+mean80p <- df %>% 
+  filter(ano >= 1980, ano <= 1990) %>%
+  filter(codigo == 'precip') %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valor) %>%
+    mutate(timerange = "1980's")
+
+# Get mean of 2000's 
+mean00p <- df %>% 
+  filter(ano >= 2000, ano <= 2010)%>%
+  filter(codigo == 'precip') %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valor) %>%
+  mutate(timerange = "2000's")
+
+mean10p <- rbind(mean80p, mean00p)
+mean10p 
+
+```
 
 
 
