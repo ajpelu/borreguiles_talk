@@ -11,6 +11,7 @@ output:
 library('plyr')
 library('dplyr')
 library("ggplot2")
+library('broom') # tidy results
 ```
 
 ## Prepare data
@@ -59,41 +60,66 @@ ggplot(ts_precip, aes(x=ano, y=mean)) +
         panel.grid.minor = element_blank())  
 ```
 
-
-
-
 ## Comparing results 
-
-
-  
+### Differences between decades
+* Diferences between 1980's and 2000's values of temperatures and precipitation
+* t-test 
 
 ```{r}
+# Temperatures for all pixels 
+t80 <- df %>% 
+  filter(ano >= 1980, ano <= 1990) %>%
+  filter(codigo == 'tmin' | codigo == 'tmax') %>% 
+  mutate(valorC = valor / 10) %>%
+  group_by(cli_celda_id, codigo) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC) 
+
+t00 <- df %>% 
+  filter(ano >= 2000, ano <= 2010) %>%
+  filter(codigo == 'tmin' | codigo == 'tmax') %>% 
+  mutate(valorC = valor / 10) %>%
+  group_by(cli_celda_id, codigo) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC) 
+
+# T.test of tmin 
+tmin80 <- t80 %>% filter(codigo == 'tmin')
+tmin00 <- t00 %>% filter(codigo == 'tmin')
+
+t.test(tmin80$mean, tmin00$mean, paired = TRUE) 
+tidy(t.test(tmin80$mean, tmin00$mean, paired = TRUE))
+
+# T.test of tmax 
+tmax80 <- t80 %>% filter(codigo == 'tmax')
+tmax00 <- t00 %>% filter(codigo == 'tmax')
+
+t.test(tmax80$mean, tmax00$mean, paired = TRUE) 
+tidy(t.test(tmax80$mean, tmax00$mean, paired = TRUE))
 
 
-# Get mean 1980-1990 
-tmin80 <- df %>% 
-            filter(codigo == 'tmin', ano >= 1980, ano <= 1990) %>%
-            mutate(valorC = valor / 10) %>%
-            group_by(cli_celda_id) %>%
-            summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC)
-tmin80 <- mutate(tmin80, tipo='tmin80')
+# Get mean of 1980's 
+mean80 <- df %>% 
+  filter(ano >= 1980, ano <= 1990) %>%
+  filter(codigo == 'tmin' | codigo == 'tmax') %>% 
+  mutate(valorC = valor / 10) %>%
+  group_by(codigo) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC) %>%
+    mutate(timerange = "1980's")
 
-tmin00 <- df %>% 
-            filter(codigo == 'tmin', ano >= 2000, ano <= 2010) %>%
-            mutate(valorC = valor / 10) %>%
-            group_by(cli_celda_id) %>%
-            summarise_each(funs(mean,sd,se=sd(.)/sqrt(n())), valorC)
-tmin00 <- mutate(tmin00, tipo='tmin00')
+# Get mean of 2000's 
+mean00 <- df %>% 
+  filter(ano >= 2000, ano <= 2010)%>%
+  filter(codigo == 'tmin' | codigo == 'tmax') %>% 
+  mutate(valorC = valor / 10) %>%
+  group_by(codigo) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC) %>%
+  mutate(timerange = "2000's")
+
+mean10 <- rbind(mean80, mean00)
+mean10 
 
 
 
-  filter(ano >= 1980) %>% 
-  filter(ano <= 1990) %>%
 
-
-
-  summarise(media=mean(valor), 
-            )
 
 
 
