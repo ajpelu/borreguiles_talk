@@ -8,6 +8,7 @@ output:
 ---
 
 ```{r}
+library('plyr')
 library('dplyr')
 library("ggplot2")
 ```
@@ -23,9 +24,11 @@ df <- tbl_df(data)
 ```
 
 ## Explore data from 1980 to 2010 
+#### A plot of the evolution of temperatures from 1980 to 2010
 ```{r}
 ts_temp <- df %>% filter(ano >= 1980) %>%
-  filter(codigo == 'tmin' | codigo == 'tmax') %>%
+  filter(codigo == 'tmin' | codigo == 'tmax') %>% 
+  mutate(codigo = revalue(codigo, c("tmin" = "Minimum", "tmax" = "Maximum"))) %>% 
   mutate(valorC = valor / 10) %>%
   group_by(ano, codigo) %>%
   summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valorC)
@@ -38,6 +41,26 @@ ggplot(ts_temp, aes(x=ano, y=mean, group=codigo)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())  
 ```
+
+#### A plot of the evolution of precipitation from 1950 to 2010
+```{r}
+ts_precip <- df %>% 
+  filter(codigo == 'precip') %>% 
+  mutate(codigo = revalue(codigo, c("precip" = "Precipitation"))) %>% 
+  group_by(ano, codigo) %>%
+  summarise_each(funs(mean, sd,se=sd(.)/sqrt(n())), valor)
+  
+ggplot(ts_precip, aes(x=ano, y=mean)) + 
+  geom_point(size=3) +
+  geom_smooth(method='loess') + 
+  theme_bw() + xlab('year') + ylab('Precipitation') + 
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())  
+```
+
+
+
 
 ## Comparing results 
 
