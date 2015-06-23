@@ -17,7 +17,9 @@ library('broom') # tidy results
 ## Prepare data
 ```{r}
 # Prepare data
-di <- '/Users/ajpelu/ownCloud/MS/CONGRESO_AEET2015/borreguiles/borreguiles_talk'
+machine <- 'ajpeluLap'
+
+di <- paste('/Users/', machine, '/ownCloud/MS/CONGRESO_AEET2015/borreguiles/borreguiles_talk', sep='')
 
 data <- read.csv(file=paste(di, '/data/climate_2300.csv', sep=''), header=TRUE, sep=";")
 
@@ -41,6 +43,19 @@ ggplot(ts_temp, aes(x=ano, y=mean, group=codigo)) +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())  
+
+ts_temp_tmin <- ts_temp %>% filter(codigo == 'Minimum') 
+
+# tiff(file="/Users/ajpeluLap/ownCloud/MS/CONGRESO_AEET2015/borreguiles/borreguiles_talk/plot_tmin.tif", res = 150, height = 700, width = 1000)
+ggplot(ts_temp_tmin, aes(x=ano, y=mean)) + 
+  geom_point(size=3) +
+  geom_smooth(method='loess') +
+  theme_bw() + xlab('year') + ylab('Annual Minimum Temperature') + 
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())  
+# dev.off()
+
 ```
 
 #### A plot of the evolution of precipitation from 1950 to 2010
